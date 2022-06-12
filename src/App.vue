@@ -9,9 +9,7 @@ import MyCalendar from './components/Calendar.vue'
 
 export default {
 	name: 'App',
-	components: {
-		MyCalendar
-	}
+	components: { MyCalendar }
 }
 </script>
 

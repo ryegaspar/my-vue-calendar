@@ -11,22 +11,19 @@
 		<div>days</div>
 	</div>
 </template>
-
 <script>
-import {format} from 'date-fns'
+import { format } from 'date-fns'
 export default {
 	name: 'HelloWorld',
-	props: {
-		msg: String
-	},
+	props: { msg: String },
+
 	data() {
-		return {
-			selectedMonth: Date.now()
-		}
+		return { selectedMonth: Date.now(), }
 	},
+
 	computed: {
 		formattedSelectedMonth() {
-			return format(this.selectedMonth, "MMMM yyyy")
+			return format(this.selectedMonth, 'MMMM yyyy')
 		}
 	}
 }
