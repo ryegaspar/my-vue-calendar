@@ -1,5 +1,7 @@
 <template>
-	<div id="app">
+	<div id="app"
+		 class="overflow-auto"
+	>
 		<my-calendar/>
 	</div>
 </template>
