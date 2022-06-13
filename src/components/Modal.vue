@@ -10,7 +10,7 @@
 
 		<div class="overflow-y-auto fixed inset-0 z-10">
 			<div class="flex justify-center items-end p-4 min-h-full text-center sm:items-center sm:p-0"
-				 @click.prevent.self="dismiss"
+				 @click.self.prevent="dismiss"
 			>
 				<div class="overflow-hidden relative px-4 pt-5 pb-4 text-left bg-white rounded-lg shadow-xl transition-all sm:p-6 sm:my-8 sm:w-full sm:max-w-sm">
 					<slot></slot>
