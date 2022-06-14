@@ -163,10 +163,8 @@ export default {
 
 		isOpen(newVal, oldVal) {
 			if (newVal === true) {
-				this.form.startDate = format(this.selectedDate, 'yyyy-MM-dd')
-				this.form.endDate = this.form.startDate
-				this.form.startTime = format(this.selectedDate, 'HH:mm')
-				this.form.endTime = format(this.selectedDate, 'HH:mm')
+				this.form.endDate = this.form.startDate = format(this.selectedDate, 'yyyy-MM-dd')
+				this.form.endTime = this.form.startTime = format(Date.now(), 'HH:mm')
 			}
 		}
 	},

@@ -1,12 +1,5 @@
 <template>
 	<div class="p-6">
-		<div>
-			<a href="#"
-			   @click.prevent="showModal"
-			>
-				show modal
-			</a>
-		</div>
 		<div class="flex p-2">
 			<div class="flex align-middle">
 				<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
@@ -32,10 +25,16 @@
 		<div v-for="(date, index) in calendarDates"
 			 :key="index"
 		>
+			<button class="p-1 m-2 hover:text-gray-200 hover:bg-purple-500 rounded border border-gray-500"
+					@click="showModal(date)"
+			>
+				add
+			</button>
 			{{ date.getDate() }} - {{ format(date, 'E') }}
 		</div>
 
 		<modal-date-entry :is-open="isShow"
+						  :selected-date="selectedDay"
 						  @close="isShow=false"
 						  @submit="submitForm"
 		/>
@@ -65,6 +64,7 @@ export default {
 	data() {
 		return {
 			selectedMonth: Date.now(),
+			selectedDay: null,
 			isShow: false
 		}
 	},
@@ -75,8 +75,8 @@ export default {
 		},
 
 		calendarDates() {
-			const firstWeekStart = startOfWeek(startOfMonth(this.selectedMonth), { weekStartsOn: 1 })
-			const lastWeekStart = endOfWeek(endOfMonth(this.selectedMonth), { weekStartsOn: 1 })
+			const firstWeekStart = startOfWeek(startOfMonth(this.selectedMonth), { weekStartsOn: 0 })
+			const lastWeekStart = endOfWeek(endOfMonth(this.selectedMonth), { weekStartsOn: 0 })
 			return eachDayOfInterval({
 										 start: firstWeekStart,
 										 end: lastWeekStart
@@ -89,8 +89,9 @@ export default {
 			return format(date, strFormat)
 		},
 
-		showModal() {
-			this.isShow = !this.isShow
+		showModal(day) {
+			this.selectedDay = day
+			this.isShow = true
 		},
 
 		nextMonth() {
@@ -106,9 +107,8 @@ export default {
 		},
 
 		submitForm() {
-			console.log('submit form')
 			this.isShow = false
 		},
-	}
+	},
 }
 </script>
