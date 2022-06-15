@@ -11,6 +11,10 @@ export default class DateEvent {
 
 	#localKey = 'CALENDAR.events'
 
+	get localKey() {
+		return this.#localKey
+	}
+
 	loadEvents() {
 		this.#storedEvents = (JSON.parse(localStorage.getItem(this.#localKey)) || [])
 		console.log(this.#storedEvents)

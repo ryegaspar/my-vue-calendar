@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"serve": "vue-cli-service serve",
-		"build": "vue-cli-service build"
+		"build": "vue-cli-service build",
+		"test": "jest --no-cache"
 	},
 	"dependencies": {
 		"autoprefixer": "^10.4.7",
@@ -15,11 +16,49 @@
 		"vue": "^2.6.14"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.18.5",
+		"@babel/preset-env": "^7.18.2",
 		"@vue/cli-plugin-babel": "~5.0.0",
 		"@vue/cli-service": "~5.0.0",
+		"babel-jest": "^28.1.1",
+		"babel-preset-env": "^1.7.0",
 		"eslint": "^8.17.0",
 		"eslint-plugin-tailwindcss": "^3.5.2",
 		"eslint-plugin-vue": "^9.1.1",
+		"jest": "^28.1.1",
+		"jest-environment-jsdom": "^28.1.1",
 		"vue-template-compiler": "^2.6.14"
+	},
+	"jest": {
+		"moduleFileExtensions": [
+			"js",
+			"vue"
+		],
+		"transform": {
+			"^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+		},
+		"moduleNameMapper": {
+			"^@/(.*)$": "<rootDir>/src/$1"
+		},
+		"testEnvironment": "jsdom"
+	},
+	"babel": {
+		"plugins": [
+			"@babel/plugin-transform-modules-commonjs"
+		],
+		"env": {
+			"test": {
+				"presets": [
+					[
+						"env",
+						{
+							"targets": {
+								"node": "current"
+							}
+						}
+					]
+				]
+			}
+		}
 	}
 }
