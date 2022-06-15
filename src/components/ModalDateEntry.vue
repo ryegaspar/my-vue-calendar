@@ -21,7 +21,6 @@
 								<input id="start-date"
 									   v-model="form.startDate"
 									   type="date"
-									   name="start-date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
 								/>
 							</div>
@@ -37,7 +36,6 @@
 								<input id="end-date"
 									   v-model="form.endDate"
 									   type="date"
-									   name="end-date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
 								/>
 							</div>
@@ -70,7 +68,6 @@
 								<input id="start-date"
 									   v-model="form.startTime"
 									   type="time"
-									   name="start-date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
 								/>
 							</div>
@@ -86,7 +83,6 @@
 								<input id="end-date"
 									   v-model="form.endTime"
 									   type="time"
-									   name="end-date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
 								/>
 							</div>
@@ -98,7 +94,7 @@
 							> Event Description </label>
 							<div class="mt-1">
 								<input id="event-name"
-									   name="event-name"
+									   v-model="form.eventDescription"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
 								/>
 							</div>
@@ -151,7 +147,8 @@ export default {
 				endDate: Date.now(),
 				allDay: false,
 				startTime: Date.now(),
-				endTime: Date.now()
+				endTime: Date.now(),
+				eventDescription: ''
 			}
 		}
 	},
@@ -175,7 +172,7 @@ export default {
 		},
 
 		submit() {
-			this.$emit('submit')
+			this.$emit('submit', this.form)
 		}
 	},
 }

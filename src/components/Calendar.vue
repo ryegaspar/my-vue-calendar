@@ -19,6 +19,13 @@
 						Next
 					</button>
 				</div>
+				<div>
+					<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
+							@click.prevent="clearStorage"
+					>
+						Clear Storage
+					</button>
+				</div>
 			</div>
 			<span class="p-2">{{ formattedSelectedMonth }}</span>
 		</div>
@@ -31,6 +38,7 @@
 				add
 			</button>
 			{{ date.getDate() }} - {{ format(date, 'E') }}
+			<div>events</div>
 		</div>
 
 		<modal-date-entry :is-open="isShow"
@@ -49,10 +57,12 @@ import {
 	endOfMonth,
 	endOfWeek,
 	format,
+	parseISO,
 	startOfMonth,
 	startOfWeek,
 	subMonths
 } from 'date-fns'
+import DateEvent from '@/DateEvent'
 import ModalDateEntry from '@/components/ModalDateEntry'
 
 export default {
@@ -65,7 +75,8 @@ export default {
 		return {
 			selectedMonth: Date.now(),
 			selectedDay: null,
-			isShow: false
+			isShow: false,
+			events: new DateEvent
 		}
 	},
 
@@ -82,6 +93,10 @@ export default {
 										 end: lastWeekStart
 									 })
 		},
+	},
+
+	mounted() {
+		this.events.loadEvents()
 	},
 
 	methods: {
@@ -106,9 +121,14 @@ export default {
 			this.selectedMonth = Date.now()
 		},
 
-		submitForm() {
+		submitForm(form) {
+			this.events.addEvent(form)
 			this.isShow = false
 		},
+
+		clearStorage() {
+			localStorage.clear()
+		}
 	},
 }
 </script>
