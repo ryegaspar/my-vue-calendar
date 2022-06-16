@@ -1,5 +1,4 @@
 <template>
-	<!-- This example requires Tailwind CSS v2.0+ -->
 	<div v-show="show"
 		 class="relative z-10"
 		 aria-labelledby="modal-title"

@@ -1,4 +1,5 @@
 import DateEvent from '@/DateEvent'
+import { format } from 'date-fns'
 
 const event = {
 	allDay: false,
@@ -27,20 +28,20 @@ const fakeLocalStorage = (function () {
 })()
 
 describe('DateEvent tests', () => {
-	let dateEvent
+	let calendarEvents
 
-	function getStorage(){
-		return JSON.parse(fakeLocalStorage.getItem(dateEvent.localKey))
+	function getStorage() {
+		return JSON.parse(fakeLocalStorage.getItem(calendarEvents.localKey))
 	}
 
 	beforeEach(() => {
 		Object.defineProperty(window, 'localStorage', { value: fakeLocalStorage })
 
-		dateEvent = new DateEvent()
+		calendarEvents = new DateEvent()
 	})
 
 	it('it can add an event and store in local storage', () => {
-		dateEvent.addEvent(event)
+		calendarEvents.storeEvent(event)
 
 		const storage = getStorage()[0]
 
@@ -50,36 +51,50 @@ describe('DateEvent tests', () => {
 							   endDate: '2000-01-01',
 							   startDate: '2000-01-01',
 							   eventDescription: 'a new event!',
-							   date: '2000-01-01'
 						   })
 	})
 
 	it('it can add an event that ranges more than a day', () => {
-		localStorage.clear()
-		dateEvent.addEvent({
-			...event,
-			...{ endDate: '2000-01-02' }
-		})
+		calendarEvents.storeEvent({
+									  ...event,
+									  ...{ endDate: '2000-01-02' }
+								  })
 
-		const storage1 = getStorage()[0]
-		const storage2 = getStorage()[1]
+		expect(getStorage().length).toBe(1)
 
-		expect(storage1)
+		expect(getStorage()[0])
 			.toMatchObject({
 							   allDay: false,
 							   endDate: '2000-01-02',
 							   startDate: '2000-01-01',
 							   eventDescription: 'a new event!',
-							   date: '2000-01-01'
 						   })
+	})
 
-		expect(storage2)
+	it('can load the current month/year events', () => {
+		const today = format(Date.now(), 'yyyy-MM-dd')
+
+		calendarEvents.storeEvent(event)
+		calendarEvents.storeEvent({
+									  ...event,
+									  ...{
+										  startDate: today,
+										  endDate: today
+									  }
+								  })
+
+		expect(getStorage().length).toBe(2)
+
+		const eventForCurrentMonth = calendarEvents.dailyEvents
+
+		expect(eventForCurrentMonth.length).toBe(1)
+		expect(eventForCurrentMonth[0])
 			.toMatchObject({
 							   allDay: false,
-							   endDate: '2000-01-02',
-							   startDate: '2000-01-01',
+							   endDate: today,
+							   startDate: today,
 							   eventDescription: 'a new event!',
-							   date: '2000-01-02'
+							   date: today
 						   })
 	})
 })
