@@ -1,26 +1,26 @@
 <template>
 	<div class="p-6">
-		<div class="flex p-2">
+		<div class="flex p-2 -ml-2">
 			<div class="flex align-middle">
-				<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
+				<button class="p-2 mr-1 text-white bg-blue-500 hover:bg-blue-700 rounded border border-gray-300"
 						@click.prevent="today"
 				>
 					Today
 				</button>
 				<div>
-					<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
+					<button class="p-2 mr-1 text-white bg-blue-500 hover:bg-blue-700 rounded border border-gray-300"
 							@click.prevent="prevMonth"
 					>
 						Previous
 					</button>
-					<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
+					<button class="p-2 mr-1 text-white bg-blue-500 hover:bg-blue-700 rounded border border-gray-300"
 							@click.prevent="nextMonth"
 					>
 						Next
 					</button>
 				</div>
 				<div>
-					<button class="p-2 mr-1 text-white bg-blue-500 rounded border border-gray-300"
+					<button class="p-2 mr-1 text-white bg-blue-500 hover:bg-blue-700 rounded border border-gray-300"
 							@click.prevent="clearStorage"
 					>
 						Clear Storage
@@ -29,16 +29,20 @@
 			</div>
 			<span class="p-2">{{ formattedSelectedMonth }}</span>
 		</div>
-		<div v-for="(date, index) in calendarDates"
-			 :key="index"
-		>
-			<button class="p-1 m-2 hover:text-gray-200 hover:bg-purple-500 rounded border border-gray-500"
-					@click="showModal(date)"
+		<div class="grid grid-cols-7 gap-1">
+			<div v-for="(date, index) in calendarDates"
+				 :key="index"
+				 class="border border-gray-500"
 			>
-				add
-			</button>
-			{{ date.getDate() }} - {{ format(date, 'E') }}
-			<div>events</div>
+				<button class="w-full text-gray-100 hover:text-gray-200 bg-blue-500 hover:bg-blue-700 border border-b-gray-500"
+						@click="showModal(date)"
+				>
+					{{ date.getDate() }} - {{ format(date, 'E') }}
+				</button>
+				<div class="overflow-y-scroll p-1.5 h-48">
+					Events!
+				</div>
+			</div>
 		</div>
 
 		<modal-date-entry :is-open="isShow"
@@ -97,6 +101,8 @@ export default {
 
 	mounted() {
 		this.events.dailyEvents
+
+		console.log(startOfWeek(parseISO('2000-01-01'), { weekStartsOn: 0 }))
 	},
 
 	methods: {

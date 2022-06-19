@@ -97,4 +97,6 @@ describe('DateEvent tests', () => {
 							   date: today
 						   })
 	})
+
+	// test to load the events by the week not by date
 })
