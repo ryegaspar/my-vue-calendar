@@ -31,7 +31,7 @@ describe('DateEvent tests', () => {
 	let calendarEvents
 
 	function getStorage() {
-		return JSON.parse(fakeLocalStorage.getItem(calendarEvents.localKey))
+		return JSON.parse(fakeLocalStorage.getItem('CALENDAR.events'))
 	}
 
 	beforeEach(() => {
@@ -41,7 +41,7 @@ describe('DateEvent tests', () => {
 	})
 
 	it('it can add an event and store in local storage', () => {
-		calendarEvents.storeEvent(event)
+		calendarEvents.addEvent(event)
 
 		const storage = getStorage()[0]
 
@@ -55,7 +55,7 @@ describe('DateEvent tests', () => {
 	})
 
 	it('it can add an event that ranges more than a day', () => {
-		calendarEvents.storeEvent({
+		calendarEvents.addEvent({
 									  ...event,
 									  ...{ endDate: '2000-01-02' }
 								  })
@@ -74,8 +74,8 @@ describe('DateEvent tests', () => {
 	it('can load the current month/year events', () => {
 		const today = format(Date.now(), 'yyyy-MM-dd')
 
-		calendarEvents.storeEvent(event)
-		calendarEvents.storeEvent({
+		calendarEvents.addEvent(event)
+		calendarEvents.addEvent({
 									  ...event,
 									  ...{
 										  startDate: today,

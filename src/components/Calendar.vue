@@ -96,7 +96,7 @@ export default {
 	},
 
 	mounted() {
-		this.events.loadEvents()
+		this.events.dailyEvents
 	},
 
 	methods: {
