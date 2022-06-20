@@ -74,11 +74,11 @@ describe('DateEvent tests', () => {
 	it('can set and get the current month/year', () => {
 		const dt = new Date('January 1, 2020')
 
-		calendarEvents.setSelected(dt).selectedMonthYear
+		calendarEvents.setSelected(dt)
 
-		expect(calendarEvents.selectedMonthYear).toBe('January 2020')
+		expect(calendarEvents.selectedMonthYearFormatted).toBe('January 2020')
 
-		expect(calendarEvents.setSelected(new Date('January 1, 2000')).selectedMonthYear).toBe('January 2000')
+		expect(calendarEvents.setSelected(new Date('January 1, 2000')).selectedMonthYearFormatted).toBe('January 2000')
 	})
 
 	it('can load the current month/year events', () => {
@@ -131,9 +131,9 @@ describe('DateEvent tests', () => {
 	it('can get all the dates on the selected month/year', () => {
 		calendarEvents.setSelected(new Date('January 1, 2000'))
 
-		expect(calendarEvents.Dates.length).toBe(42)
-		expect(calendarEvents.Dates[0].toISOString()).toBe('1999-12-26T06:00:00.000Z')
-		expect(calendarEvents.Dates[18].toISOString()).toBe('2000-01-13T06:00:00.000Z')
-		expect(calendarEvents.Dates[41].toISOString()).toBe('2000-02-05T06:00:00.000Z')
+		expect(calendarEvents.dates.length).toBe(42)
+		expect(calendarEvents.dates[0].toISOString()).toBe('1999-12-26T06:00:00.000Z')
+		expect(calendarEvents.dates[18].toISOString()).toBe('2000-01-13T06:00:00.000Z')
+		expect(calendarEvents.dates[41].toISOString()).toBe('2000-02-05T06:00:00.000Z')
 	})
 })

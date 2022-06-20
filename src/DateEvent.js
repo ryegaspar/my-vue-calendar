@@ -37,10 +37,14 @@ export default class DateEvent {
 	}
 
 	get selectedMonthYear() {
+		return this.#selectedMonthYear
+	}
+
+	get selectedMonthYearFormatted() {
 		return format(this.#selectedMonthYear, 'MMMM yyyy')
 	}
 
-	get Dates() {
+	get dates() {
 		return eachDayOfInterval({
 									 start: this.#selectedStartDate,
 									 end: this.#selectedEndDate
