@@ -40,7 +40,7 @@ describe('DateEvent tests', () => {
 		calendarEvents = new DateEvent()
 	})
 
-	it('it can add an event and store in local storage', () => {
+	it('can add an event and store in local storage', () => {
 		calendarEvents.addEvent(event)
 
 		const storage = getStorage()[0]
@@ -54,11 +54,11 @@ describe('DateEvent tests', () => {
 						   })
 	})
 
-	it('it can add an event that ranges more than a day', () => {
+	it('can add an event that ranges more than a day', () => {
 		calendarEvents.addEvent({
-									  ...event,
-									  ...{ endDate: '2000-01-02' }
-								  })
+			...event,
+			...{ endDate: '2000-01-02' }
+		})
 
 		expect(getStorage().length).toBe(1)
 
@@ -71,17 +71,27 @@ describe('DateEvent tests', () => {
 						   })
 	})
 
+	it('can set and get the current month/year', () => {
+		const dt = new Date('January 1, 2020')
+
+		calendarEvents.setSelected(dt).selectedMonthYear
+
+		expect(calendarEvents.selectedMonthYear).toBe('January 2020')
+
+		expect(calendarEvents.setSelected(new Date('January 1, 2000')).selectedMonthYear).toBe('January 2000')
+	})
+
 	it('can load the current month/year events', () => {
 		const today = format(Date.now(), 'yyyy-MM-dd')
 
 		calendarEvents.addEvent(event)
 		calendarEvents.addEvent({
-									  ...event,
-									  ...{
-										  startDate: today,
-										  endDate: today
-									  }
-								  })
+			...event,
+			...{
+				startDate: today,
+				endDate: today
+			}
+		})
 
 		expect(getStorage().length).toBe(2)
 
@@ -98,5 +108,23 @@ describe('DateEvent tests', () => {
 						   })
 	})
 
-	// test to load the events by the week not by date
+	it('can load adjacent month events that are within the week of the selected month/year', () => {
+		// january 1, 2000 is saturday.
+		// december 27, 1999 is monday and both are in the same week
+		const day = format(new Date('December 27, 1999'), 'yyyy-MM-dd')
+
+		calendarEvents.setSelected(new Date('January 1, 2000'))
+
+		calendarEvents.addEvent(event)
+		expect(calendarEvents.dailyEvents.length).toBe(1)
+
+		calendarEvents.addEvent({
+			...event,
+			...{
+				startDate: day,
+				endDate: day
+			}
+		})
+		expect(calendarEvents.dailyEvents.length).toBe(2)
+	})
 })

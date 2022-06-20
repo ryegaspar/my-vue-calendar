@@ -1,12 +1,11 @@
 import {
 	addDays,
 	differenceInDays,
-	endOfMonth,
+	endOfMonth, endOfWeek,
 	format,
 	isSameDay,
 	isWithinInterval,
-	parseISO,
-	startOfMonth
+	parseISO, startOfMonth, startOfWeek
 } from 'date-fns'
 
 export default class DateEvent {
@@ -15,7 +14,16 @@ export default class DateEvent {
 
 	#selectedMonthYear = Date.now()
 
+	#selectedStartDate
+
+	#selectedEndDate
+
 	#dailyEvents = []
+
+	constructor() {
+		this.#selectedStartDate = startOfWeek(startOfMonth(this.#selectedMonthYear), { weekStartsOn: 0 })
+		this.#selectedEndDate = endOfWeek(endOfMonth(this.#selectedMonthYear), { weekStartsOn: 0 })
+	}
 
 	get storedEvents() {
 		return (JSON.parse(localStorage.getItem('CALENDAR.events')) || [])
@@ -26,17 +34,33 @@ export default class DateEvent {
 		return this.#dailyEvents
 	}
 
+	get selectedMonthYear() {
+		return format(this.#selectedMonthYear, 'MMMM yyyy')
+	}
+
 	addEvent(event) {
 		this.#storedEvents.push(event)
 		localStorage.setItem('CALENDAR.events', JSON.stringify(this.#storedEvents))
 
 		// if this is within the selected month, add the event to daily events
+		if (this.isWithinSelected(event.startDate) || this.isWithinSelected(event.endDate)) {
+			this.addEventToSelected(event)
+		}
+	}
+
+	setSelected(monthYear) {
+		this.#selectedMonthYear = monthYear
+
+		this.#selectedStartDate = startOfWeek(startOfMonth(monthYear), { weekStartsOn: 0 })
+		this.#selectedEndDate = endOfWeek(endOfMonth(monthYear), { weekStartsOn: 0 })
+
+		return this
 	}
 
 	isWithinSelected(event) {
 		return isWithinInterval(parseISO(event), {
-			start: startOfMonth(this.#selectedMonthYear),
-			end: endOfMonth(this.#selectedMonthYear)
+			start: this.#selectedStartDate,
+			end: this.#selectedEndDate
 		})
 	}
 
