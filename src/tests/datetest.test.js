@@ -127,4 +127,13 @@ describe('DateEvent tests', () => {
 		})
 		expect(calendarEvents.dailyEvents.length).toBe(2)
 	})
+
+	it('can get all the dates on the selected month/year', () => {
+		calendarEvents.setSelected(new Date('January 1, 2000'))
+
+		expect(calendarEvents.Dates.length).toBe(42)
+		expect(calendarEvents.Dates[0].toISOString()).toBe('1999-12-26T06:00:00.000Z')
+		expect(calendarEvents.Dates[18].toISOString()).toBe('2000-01-13T06:00:00.000Z')
+		expect(calendarEvents.Dates[41].toISOString()).toBe('2000-02-05T06:00:00.000Z')
+	})
 })

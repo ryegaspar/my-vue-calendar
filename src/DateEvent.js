@@ -1,7 +1,9 @@
 import {
 	addDays,
 	differenceInDays,
-	endOfMonth, endOfWeek,
+	eachDayOfInterval,
+	endOfMonth,
+	endOfWeek,
 	format,
 	isSameDay,
 	isWithinInterval,
@@ -36,6 +38,13 @@ export default class DateEvent {
 
 	get selectedMonthYear() {
 		return format(this.#selectedMonthYear, 'MMMM yyyy')
+	}
+
+	get Dates() {
+		return eachDayOfInterval({
+									 start: this.#selectedStartDate,
+									 end: this.#selectedEndDate
+								 })
 	}
 
 	addEvent(event) {
