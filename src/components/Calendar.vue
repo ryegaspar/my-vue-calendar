@@ -27,15 +27,16 @@
 					</button>
 				</div>
 			</div>
-			<span class="p-2">{{ formattedSelectedMonth }}</span>
+			<span class="p-2">{{ selectedMonthFormatted }}</span>
 		</div>
 		<div class="grid grid-cols-7 gap-1">
 			<div v-for="(date, index) in calendarDates"
 				 :key="index"
 				 class="border border-gray-500"
 			>
-				<button class="w-full text-gray-100 hover:text-gray-200 bg-blue-500 hover:bg-blue-700 border border-b-gray-500"
-						@click="showModal(date)"
+				<button
+					class="w-full text-gray-100 hover:text-gray-200 bg-blue-500 hover:bg-blue-700 border border-b-gray-500"
+					@click="showModal(date)"
 				>
 					{{ date.getDate() }} - {{ format(date, 'E') }}
 				</button>
@@ -45,9 +46,9 @@
 			</div>
 		</div>
 
-		<modal-date-entry :is-open="isShow"
-						  :selected-date="selectedDay"
-						  @close="isShow=false"
+		<modal-date-entry :is-open="isModalShown"
+						  :selected-date="modalSelectedDay"
+						  @close="isModalShown=false"
 						  @submit="submitForm"
 		/>
 
@@ -66,43 +67,42 @@ import {
 	startOfWeek,
 	subMonths
 } from 'date-fns'
-import DateEvent from '@/DateEvent'
+
 import ModalDateEntry from '@/components/ModalDateEntry'
 
 export default {
 
 	components: { ModalDateEntry },
 
-	props: { msg: String },
+	props: {},
 
 	data() {
 		return {
+			isModalShown: false,
+			modalSelectedDay: null,
 			selectedMonth: Date.now(),
-			selectedDay: null,
-			isShow: false,
-			events: new DateEvent
 		}
 	},
 
 	computed: {
-		formattedSelectedMonth() {
+		selectedMonthFormatted() {
 			return format(this.selectedMonth, 'MMMM yyyy')
 		},
 
+		selectedStartDate() {
+			return startOfWeek(startOfMonth(this.selectedMonth), { weekStartsOn: 0 })
+		},
+
+		selectedEndDate() {
+			return endOfWeek(endOfMonth(this.selectedMonth), { weekStartsOn: 0 })
+		},
+
 		calendarDates() {
-			const firstWeekStart = startOfWeek(startOfMonth(this.selectedMonth), { weekStartsOn: 0 })
-			const lastWeekStart = endOfWeek(endOfMonth(this.selectedMonth), { weekStartsOn: 0 })
 			return eachDayOfInterval({
-										 start: firstWeekStart,
-										 end: lastWeekStart
+										 start: this.selectedStartDate,
+										 end: this.selectedEndDate
 									 })
 		},
-	},
-
-	mounted() {
-		this.events.dailyEvents
-
-		console.log(startOfWeek(parseISO('2000-01-01'), { weekStartsOn: 0 }))
 	},
 
 	methods: {
@@ -111,8 +111,8 @@ export default {
 		},
 
 		showModal(day) {
-			this.selectedDay = day
-			this.isShow = true
+			this.modalSelectedDay = day
+			this.isModalShown = true
 		},
 
 		nextMonth() {
@@ -128,13 +128,13 @@ export default {
 		},
 
 		submitForm(form) {
-			this.events.addEvent(form)
-			this.isShow = false
+			// this.events.addEvent(form)
+			this.isModalShown = false
 		},
 
 		clearStorage() {
 			localStorage.clear()
 		}
-	},
+	}
 }
 </script>
