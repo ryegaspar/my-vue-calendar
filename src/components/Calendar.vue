@@ -40,8 +40,15 @@
 				>
 					{{ date.getDate() }} - {{ format(date, 'E') }}
 				</button>
-				<div class="overflow-y-scroll p-1.5 h-48">
-					Events!
+				<div class="overflow-y-scroll h-48">
+					<ul class="m-0.5">
+						<li v-for="(ev, index) in eventFor(date)"
+							:key="index"
+							class="w-full bg-amber-500"
+						>
+							{{ ev.eventDescription }}
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>
@@ -57,11 +64,16 @@
 
 <script>
 import {
+	addDays,
 	addMonths,
+	differenceInDays,
 	eachDayOfInterval,
 	endOfMonth,
 	endOfWeek,
 	format,
+	isEqual,
+	isSameDay,
+	isWithinInterval,
 	parseISO,
 	startOfMonth,
 	startOfWeek,
@@ -81,6 +93,7 @@ export default {
 			isModalShown: false,
 			modalSelectedDay: null,
 			selectedMonth: Date.now(),
+			eventsFromSelected: []
 		}
 	},
 
@@ -105,7 +118,63 @@ export default {
 		},
 	},
 
+	watch: {
+		selectedMonth(newVal, oldVal) {
+			this.load()
+		}
+	},
+
+	mounted() {
+		this.load()
+	},
+
 	methods: {
+		// persistence
+		load() {
+			this.eventsFromSelected = []
+
+			const storedEventsForMonth = (JSON.parse(localStorage.getItem('CALENDAR.events')))
+				.filter(i => this.isWithinSelected(i.startDate) || this.isWithinSelected(i.endDate)) ||
+				[]
+
+			storedEventsForMonth.forEach((ev) => {
+				this.appendToSelected(ev)
+			})
+		},
+
+		appendToSelected(event) {
+			const startDate = parseISO(event.startDate)
+			const endDate = parseISO(event.endDate)
+
+			let tempEvent = Object.assign({}, event)
+			tempEvent.date = event.startDate
+
+			const continuousDay = !isSameDay(startDate, endDate)
+			event.continuousDay = continuousDay
+
+			if (this.isWithinSelected(tempEvent.date)) {
+				this.eventsFromSelected.push(tempEvent)
+			}
+
+			if (continuousDay) {
+				const dateDiff = differenceInDays(endDate, startDate)
+				for (let i = 1; i <= dateDiff; i++) {
+					tempEvent = Object.assign({}, event)
+					tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
+					if (this.isWithinSelected(tempEvent.date)) {
+						this.eventsFromSelected.push(tempEvent)
+					}
+				}
+			}
+		},
+
+		isWithinSelected(date) {
+			return isWithinInterval(parseISO(date), {
+				start: this.selectedStartDate,
+				end: this.selectedEndDate
+			})
+		},
+
 		format(date, strFormat) {
 			return format(date, strFormat)
 		},
@@ -127,8 +196,18 @@ export default {
 			this.selectedMonth = Date.now()
 		},
 
-		submitForm(form) {
-			// this.events.addEvent(form)
+		eventFor(date) {
+			return this.eventsFromSelected.filter(i => {
+				return isEqual(parseISO(i.date), date)
+			})
+		},
+
+		submitForm(formData) {
+			const storedEvent = JSON.parse(localStorage.getItem('CALENDAR.events')) || []
+			storedEvent.push(formData)
+			localStorage.setItem('CALENDAR.events', JSON.stringify(storedEvent))
+			this.appendToSelected(formData)
+
 			this.isModalShown = false
 		},
 
