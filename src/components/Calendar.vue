@@ -29,10 +29,10 @@
 			</div>
 			<span class="p-2">{{ selectedMonthFormatted }}</span>
 		</div>
-		<div class="grid grid-cols-7 gap-1">
+		<div class="grid grid-cols-7 gap-0">
 			<div v-for="(date, index) in calendarDates"
 				 :key="index"
-				 class="border border-gray-500"
+				 class="border border-gray-600"
 			>
 				<button
 					class="w-full text-gray-100 hover:text-gray-200 bg-blue-500 hover:bg-blue-700 border border-b-gray-500"
@@ -41,12 +41,13 @@
 					{{ date.getDate() }} - {{ format(date, 'E') }}
 				</button>
 				<div class="overflow-y-scroll h-48">
-					<ul class="m-0.5">
+					<ul class="whitespace-nowrap">
 						<li v-for="(ev, index) in eventFor(date)"
 							:key="index"
-							class="w-full bg-amber-500"
+							class="overflow-x-hidden px-1 text-left text-ellipsis"
+							:class="eventBgColors[index%8]"
 						>
-							{{ ev.eventDescription }}
+							{{ ev.startTime }} - {{ ev.eventDescription }}
 						</li>
 					</ul>
 				</div>
@@ -93,7 +94,17 @@ export default {
 			isModalShown: false,
 			modalSelectedDay: null,
 			selectedMonth: Date.now(),
-			eventsFromSelected: []
+			eventsFromSelected: [],
+			eventBgColors: [
+				'text-gray-900 bg-amber-500',
+				'text-gray-200 bg-blue-500',
+				'text-gray-200 bg-red-500',
+				'text-gray-900 bg-yellow-500',
+				'text-gray-900 bg-green-500',
+				'text-gray-200 bg-indigo-500',
+				'text-gray-900 bg-purple-500',
+				'text-gray-200 bg-pink-500',
+			]
 		}
 	},
 
@@ -133,13 +144,14 @@ export default {
 		load() {
 			this.eventsFromSelected = []
 
-			const storedEventsForMonth = (JSON.parse(localStorage.getItem('CALENDAR.events')))
-				.filter(i => this.isWithinSelected(i.startDate) || this.isWithinSelected(i.endDate)) ||
-				[]
+			const storedEventsForMonth = (JSON.parse(localStorage.getItem('CALENDAR.events')) || [])
 
-			storedEventsForMonth.forEach((ev) => {
-				this.appendToSelected(ev)
-			})
+			if (storedEventsForMonth) {
+				storedEventsForMonth.filter(i => this.isWithinSelected(i.startDate) || this.isWithinSelected(i.endDate))
+					.forEach((ev) => {
+						this.appendToSelected(ev)
+					})
+			}
 		},
 
 		appendToSelected(event) {
@@ -149,14 +161,11 @@ export default {
 			let tempEvent = Object.assign({}, event)
 			tempEvent.date = event.startDate
 
-			const continuousDay = !isSameDay(startDate, endDate)
-			event.continuousDay = continuousDay
-
 			if (this.isWithinSelected(tempEvent.date)) {
 				this.eventsFromSelected.push(tempEvent)
 			}
 
-			if (continuousDay) {
+			if (!isSameDay(startDate, endDate)) {
 				const dateDiff = differenceInDays(endDate, startDate)
 				for (let i = 1; i <= dateDiff; i++) {
 					tempEvent = Object.assign({}, event)
