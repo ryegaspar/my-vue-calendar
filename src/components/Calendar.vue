@@ -83,6 +83,8 @@ import {
 
 import ModalDateEntry from '@/components/ModalDateEntry'
 
+import { v4 as uuidv4 } from 'uuid'
+
 export default {
 
 	components: { ModalDateEntry },
@@ -212,6 +214,7 @@ export default {
 		},
 
 		submitForm(formData) {
+			formData.id = uuidv4()
 			const storedEvent = JSON.parse(localStorage.getItem('CALENDAR.events')) || []
 			storedEvent.push(formData)
 			localStorage.setItem('CALENDAR.events', JSON.stringify(storedEvent))
