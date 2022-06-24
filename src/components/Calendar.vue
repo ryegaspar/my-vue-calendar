@@ -81,6 +81,8 @@ import {
 	subMonths
 } from 'date-fns'
 
+import MonthEvents from '@/MonthEvents'
+
 import ModalDateEntry from '@/components/ModalDateEntry'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -97,6 +99,7 @@ export default {
 			modalSelectedDay: null,
 			selectedMonth: Date.now(),
 			eventsFromSelected: [],
+			eventsArranged: [],
 			eventBgColors: [
 				'text-gray-900 bg-amber-500',
 				'text-gray-200 bg-blue-500',
@@ -177,6 +180,8 @@ export default {
 					}
 				}
 			}
+
+			this.eventsArranged = (new MonthEvents(this.eventsFromSelected)).events
 		},
 
 		isWithinSelected(date) {

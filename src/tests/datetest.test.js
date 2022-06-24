@@ -1,4 +1,4 @@
-import DateEvent from '@/DateEvent'
+import DateEvent from '@/MonthEvents'
 import { format } from 'date-fns'
 
 const event = {
