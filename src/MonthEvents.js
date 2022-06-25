@@ -2,8 +2,13 @@ import {
 	addDays,
 	differenceInDays,
 	endOfMonth,
-	endOfWeek, format, isSameDay,
-	isWithinInterval, parseISO, startOfMonth, startOfWeek
+	endOfWeek,
+	format,
+	isSameDay,
+	isWithinInterval,
+	parseISO,
+	startOfMonth,
+	startOfWeek
 } from 'date-fns'
 
 class MonthEvents {
@@ -35,6 +40,10 @@ class MonthEvents {
 		return endOfWeek(endOfMonth(this.#selectedMonth), { weekStartsOn: 0 })
 	}
 
+	get uniqueDays() {
+		return Array.from(new Set(this.#events.map(i => i.date)))
+	}
+
 	setSelectedMonth(date) {
 		this.#selectedMonth = date
 		this.clearEvents()
@@ -46,45 +55,57 @@ class MonthEvents {
 		this.#events = []
 	}
 
-	addEvent(event) {
+	setEvents(eventParam) {
+		this.clearEvents()
 
-	}
-
-	addEvents(events) {
-		const eventsArranged = []
-
-		events.forEach(ev => {
-			eventsArranged.push(...this.explodeEvent(ev))
+		eventParam.forEach(ev => {
+			this.#events.push(...this.expandEvent(ev))
 		})
 
-		return eventsArranged
+		this.markMultiple()
+
+		return this
 	}
 
-	explodeEvent(event) {
-		const explodedEvent = []
+	expandEvent(event) {
+		const expandedEvent = []
 
 		const startDate = parseISO(event.startDate)
 		const endDate = parseISO(event.endDate)
 
-		let tempEvent = Object.assign({}, event)
+		const tempEvent = Object.assign({}, event)
 		tempEvent.date = event.startDate
 
 		if (this.isWithinSelected(tempEvent.date)) {
-			explodedEvent.push(tempEvent)
+			expandedEvent.push(tempEvent)
 		}
 
 		if (!isSameDay(startDate, endDate)) {
 			const dateDiff = differenceInDays(endDate, startDate)
 			for (let i = 1; i <= dateDiff; i++) {
-				tempEvent = Object.assign({}, event)
-				tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
-				if (this.isWithinSelected(tempEvent.date)) {
-					explodedEvent.push(tempEvent)
+				const subsequentEvent = Object.assign({}, event)
+				subsequentEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
+				if (this.isWithinSelected(subsequentEvent.date)) {
+					expandedEvent.push(subsequentEvent)
 				}
 			}
 		}
 
-		return explodedEvent
+		return expandedEvent
+	}
+
+	markMultiple() {
+		this.#events
+			.filter(i => !i.hasOwnProperty('multiple'))
+			.forEach(ev => {
+				const findOthers = (id, date) => {
+					return this.#events.filter(i => {
+						return i.id === id && (i.date !== date)
+					})
+				}
+
+				ev.multiple = !!findOthers(ev.id, ev.date).length
+			})
 	}
 
 	isWithinSelected(date) {
@@ -93,12 +114,6 @@ class MonthEvents {
 			end: this.endDate
 		})
 	}
-
-	/**
-	 * TODO:
-	 * events added should only be within the scope of the month selected
-	 * ability to add/delete events
-	 */
 }
 
 const monthEvent = MonthEvents.getInstance()

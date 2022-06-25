@@ -159,7 +159,8 @@ export default {
 				// 	this.appendToSelected(ev) // TODO, edit this! do not append until after all are loaded!
 				// })
 				this.eventsArranged = monthEvent.setSelectedMonth(this.selectedMonth)
-					.addEvents(storedEventsForMonth)
+					.setEvents(storedEventsForMonth)
+					.events
 			}
 		},
 
