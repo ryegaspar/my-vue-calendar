@@ -53,55 +53,38 @@ class MonthEvents {
 	addEvents(events) {
 		const eventsArranged = []
 
-		events.forEach((ev) => {
-			const startDate = parseISO(ev.startDate)
-			const endDate = parseISO(ev.endDate)
-
-			let tempEvent = Object.assign({}, ev)
-			tempEvent.date = ev.startDate
-
-			if (this.isWithinSelected(tempEvent.date)) {
-				eventsArranged.push(tempEvent)
-			}
-
-			if (!isSameDay(startDate, endDate)) {
-				const dateDiff = differenceInDays(endDate, startDate)
-				for (let i = 1; i <= dateDiff; i++) {
-					tempEvent = Object.assign({}, ev)
-					tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
-					if (this.isWithinSelected(tempEvent.date)) {
-						eventsArranged.push(tempEvent)
-					}
-				}
-			}
-
-			// const findOthers = (id, date) => {
-			// 	return events.filter(i => {
-			// 		return i.id === id && (i.date !== date)
-			// 	})
-			// }
-			//
-			// // console.log(findOthers(ev.id, ev.date))
-			// ev.isContinous = !!findOthers(ev.id, ev.date).length
+		events.forEach(ev => {
+			eventsArranged.push(...this.explodeEvent(ev))
 		})
 
-		// group by date
-		// const groupedEvents = events.reduce((group, ev) => {
-		// 	group[ev.date] = [
-		// 		...group[ev.date] || [], ev
-		// 	]
-		// 	return group
-		// }, {})
-		//
-		// // sort events
-		// Object.values(groupedEvents)
-		// 	  .forEach(date => {
-		// 		  date.sort((dateA, dateB) => {
-		// 			  return parseFloat((dateA.startTime).replace(':', '.')) - parseFloat((dateB.startTime).replace(':', '.'))
-		// 		  })
-		// 	  })
-
 		return eventsArranged
+	}
+
+	explodeEvent(event) {
+		const explodedEvent = []
+
+		const startDate = parseISO(event.startDate)
+		const endDate = parseISO(event.endDate)
+
+		let tempEvent = Object.assign({}, event)
+		tempEvent.date = event.startDate
+
+		if (this.isWithinSelected(tempEvent.date)) {
+			explodedEvent.push(tempEvent)
+		}
+
+		if (!isSameDay(startDate, endDate)) {
+			const dateDiff = differenceInDays(endDate, startDate)
+			for (let i = 1; i <= dateDiff; i++) {
+				tempEvent = Object.assign({}, event)
+				tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
+				if (this.isWithinSelected(tempEvent.date)) {
+					explodedEvent.push(tempEvent)
+				}
+			}
+		}
+
+		return explodedEvent
 	}
 
 	isWithinSelected(date) {
