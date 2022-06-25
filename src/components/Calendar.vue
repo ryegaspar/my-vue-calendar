@@ -54,6 +54,8 @@
 			</div>
 		</div>
 
+		{{ eventsArranged }}
+
 		<modal-date-entry :is-open="isModalShown"
 						  :selected-date="modalSelectedDay"
 						  @close="isModalShown=false"
@@ -81,9 +83,9 @@ import {
 	subMonths
 } from 'date-fns'
 
-import MonthEvents from '@/MonthEvents'
-
 import ModalDateEntry from '@/components/ModalDateEntry'
+
+import monthEvent from '@/MonthEvents'
 
 import { v4 as uuidv4 } from 'uuid'
 
@@ -153,36 +155,38 @@ export default {
 
 			if (storedEventsForMonth) {
 				storedEventsForMonth.filter(i => this.isWithinSelected(i.startDate) || this.isWithinSelected(i.endDate))
-					.forEach((ev) => {
-						this.appendToSelected(ev)
-					})
+				// .forEach((ev) => {
+				// 	this.appendToSelected(ev) // TODO, edit this! do not append until after all are loaded!
+				// })
+				this.eventsArranged = monthEvent.setSelectedMonth(this.selectedMonth)
+					.addEvents(storedEventsForMonth)
 			}
 		},
 
-		appendToSelected(event) {
-			const startDate = parseISO(event.startDate)
-			const endDate = parseISO(event.endDate)
-
-			let tempEvent = Object.assign({}, event)
-			tempEvent.date = event.startDate
-
-			if (this.isWithinSelected(tempEvent.date)) {
-				this.eventsFromSelected.push(tempEvent)
-			}
-
-			if (!isSameDay(startDate, endDate)) {
-				const dateDiff = differenceInDays(endDate, startDate)
-				for (let i = 1; i <= dateDiff; i++) {
-					tempEvent = Object.assign({}, event)
-					tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
-					if (this.isWithinSelected(tempEvent.date)) {
-						this.eventsFromSelected.push(tempEvent)
-					}
-				}
-			}
-
-			this.eventsArranged = (new MonthEvents(this.eventsFromSelected)).events
-		},
+		// appendToSelected(event) {
+		// 	const startDate = parseISO(event.startDate)
+		// 	const endDate = parseISO(event.endDate)
+		//
+		// 	let tempEvent = Object.assign({}, event)
+		// 	tempEvent.date = event.startDate
+		//
+		// 	if (this.isWithinSelected(tempEvent.date)) {
+		// 		this.eventsFromSelected.push(tempEvent)
+		// 	}
+		//
+		// 	if (!isSameDay(startDate, endDate)) {
+		// 		const dateDiff = differenceInDays(endDate, startDate)
+		// 		for (let i = 1; i <= dateDiff; i++) {
+		// 			tempEvent = Object.assign({}, event)
+		// 			tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
+		// 			if (this.isWithinSelected(tempEvent.date)) {
+		// 				this.eventsFromSelected.push(tempEvent)
+		// 			}
+		// 		}
+		// 	}
+		//
+		// 	this.eventsArranged = MonthEvents.addEvents(this.eventsFromSelected).events
+		// },
 
 		isWithinSelected(date) {
 			return isWithinInterval(parseISO(date), {
@@ -213,16 +217,22 @@ export default {
 		},
 
 		eventFor(date) {
-			return this.eventsFromSelected.filter(i => {
-				return isEqual(parseISO(i.date), date)
-			})
+			let dayEvents = []
+
+			Object.keys(this.eventsArranged)
+				  .filter(key => isEqual(parseISO(key), date))
+				  .forEach(i => dayEvents = this.eventsArranged[i])
+
+			return dayEvents
 		},
 
 		submitForm(formData) {
 			formData.id = uuidv4()
+
 			const storedEvent = JSON.parse(localStorage.getItem('CALENDAR.events')) || []
 			storedEvent.push(formData)
 			localStorage.setItem('CALENDAR.events', JSON.stringify(storedEvent))
+
 			this.appendToSelected(formData)
 
 			this.isModalShown = false
