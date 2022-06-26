@@ -202,7 +202,8 @@ export default {
 			storedEvent.push(formData)
 			localStorage.setItem('CALENDAR.events', JSON.stringify(storedEvent))
 
-			this.appendToSelected(formData)
+			this.load()
+			// this.eventsArranged = monthEvent.addEvent(formData).events
 
 			this.isModalShown = false
 		},

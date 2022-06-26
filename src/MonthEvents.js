@@ -115,20 +115,21 @@ class MonthEvents {
 
 		this.uniqueDays
 			.forEach(date => {
-				let count = 0
-
 				const eventForTheDay =this.#events.filter(event =>
 					event.date === date
 				)
 
 				eventForTheDay.sort((eventA, eventB) => {
-					return this.parseTime(eventA.startTime) - this.parseTime(eventB.startTime)
+					if (eventA.allDay && eventB.allDay) {
+						return 0
+					} else if (eventA.allDay) {
+						return -1
+					} else if (eventB.allDay) {
+						return 1
+					} else {
+						return this.parseTime(eventA.startTime) - this.parseTime(eventB.startTime)
+					}
 				})
-
-				for(let ev of eventForTheDay) {
-					ev.order = count
-					count++
-				}
 
 				orderedEvents.push(...eventForTheDay)
 			})
@@ -144,7 +145,10 @@ class MonthEvents {
 	}
 
 	parseTime(time) {
-		return parseFloat(time.replace(':', '.'))
+		if (typeof time === 'string') {
+			return parseFloat(time.replace(':', '.'))
+		}
+		return parseFloat(time)
 	}
 }
 

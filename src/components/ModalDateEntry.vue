@@ -22,6 +22,7 @@
 									   v-model="form.startDate"
 									   type="date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
+									   @change="dateChanged"
 								/>
 							</div>
 						</div>
@@ -37,6 +38,7 @@
 									   v-model="form.endDate"
 									   type="date"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
+									   @change="dateChanged"
 								/>
 							</div>
 						</div>
@@ -48,12 +50,15 @@
 										   v-model="form.allDay"
 										   type="checkbox"
 										   class="w-4 h-4 text-indigo-600 rounded border border-gray-300 focus:ring-indigo-500"
+										   :disabled="disableAllDayOption"
 									/>
 								</div>
 								<div class="ml-3 text-sm">
 									<label for="all-day"
 										   class="font-medium text-gray-700"
-									>All Day</label>
+									>
+										All Day
+									</label>
 								</div>
 							</div>
 						</div>
@@ -69,6 +74,7 @@
 									   v-model="form.startTime"
 									   type="time"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
+									   :disabled="allDay"
 								/>
 							</div>
 						</div>
@@ -84,6 +90,7 @@
 									   v-model="form.endTime"
 									   type="time"
 									   class="block p-1 w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm sm:text-sm"
+									   :disabled="allDay"
 								/>
 							</div>
 						</div>
@@ -124,14 +131,17 @@
 
 <script>
 import Modal from '@/components/Modal'
-import { format } from 'date-fns'
+
+import {
+	format
+} from 'date-fns'
 
 export default {
 	components: { Modal },
 	props: {
 		isOpen: {
 			required: true,
-			type: Boolean 
+			type: Boolean
 		},
 
 		selectedDate: {
@@ -149,13 +159,24 @@ export default {
 				startTime: Date.now(),
 				endTime: Date.now(),
 				eventDescription: ''
-			}
+			},
+
+			disableAllDayOption: false
+		}
+	},
+
+	computed: {
+		allDay() {
+			return this.form.allDay
 		}
 	},
 
 	watch: {
-		allDay() {
-			console.log('all day changed', this.allDay)
+		allDay(newVal) {
+			if (newVal) {
+				this.form.startTime = new Date().setUTCHours(0,0,0,0)
+				this.form.endTime = new Date().setUTCHours(0,0,0,0)
+			}
 		},
 
 		isOpen(newVal, oldVal) {
@@ -167,11 +188,23 @@ export default {
 	},
 
 	methods: {
+		dateChanged() {
+			const startDate = new Date(this.form.startDate).getDate()
+			const endDate = new Date(this.form.endDate).getDate()
+
+			this.form.allDay = this.disableAllDayOption = startDate !== endDate
+		},
+
 		closeModal() {
 			this.$emit('close')
 		},
 
 		submit() {
+			if (this.allDay) {
+				this.form.startTime = 0
+				this.form.endTime = 0
+			}
+
 			this.$emit('submit', this.form)
 		}
 	},
