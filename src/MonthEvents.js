@@ -14,10 +14,10 @@ import {
 class MonthEvents {
 	#events = []
 
-	#selectedMonth
+	#currentSelectedDay
 
 	constructor() {
-		this.#selectedMonth = Date.now()
+		this.#currentSelectedDay = Date.now()
 	}
 
 	static getInstance() {
@@ -33,11 +33,11 @@ class MonthEvents {
 	}
 
 	get startDate() {
-		return startOfWeek(startOfMonth(this.#selectedMonth), { weekStartsOn: 0 })
+		return startOfWeek(startOfMonth(this.#currentSelectedDay), { weekStartsOn: 0 })
 	}
 
 	get endDate() {
-		return endOfWeek(endOfMonth(this.#selectedMonth), { weekStartsOn: 0 })
+		return endOfWeek(endOfMonth(this.#currentSelectedDay), { weekStartsOn: 0 })
 	}
 
 	get uniqueDays() {
@@ -45,7 +45,7 @@ class MonthEvents {
 	}
 
 	setSelectedMonth(date) {
-		this.#selectedMonth = date
+		this.#currentSelectedDay = date
 		this.clearEvents()
 
 		return this
@@ -63,6 +63,8 @@ class MonthEvents {
 		})
 
 		this.markMultiple()
+
+		this.#events = this.setInitialOrder()
 
 		return this
 	}
@@ -108,11 +110,41 @@ class MonthEvents {
 			})
 	}
 
+	setInitialOrder() {
+		const orderedEvents = []
+
+		this.uniqueDays
+			.forEach(date => {
+				let count = 0
+
+				const eventForTheDay =this.#events.filter(event =>
+					event.date === date
+				)
+
+				eventForTheDay.sort((eventA, eventB) => {
+					return this.parseTime(eventA.startTime) - this.parseTime(eventB.startTime)
+				})
+
+				for(let ev of eventForTheDay) {
+					ev.order = count
+					count++
+				}
+
+				orderedEvents.push(...eventForTheDay)
+			})
+
+		return orderedEvents
+	}
+
 	isWithinSelected(date) {
 		return isWithinInterval(parseISO(date), {
 			start: this.startDate,
 			end: this.endDate
 		})
+	}
+
+	parseTime(time) {
+		return parseFloat(time.replace(':', '.'))
 	}
 }
 

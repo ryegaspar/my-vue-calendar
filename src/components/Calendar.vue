@@ -155,39 +155,12 @@ export default {
 
 			if (storedEventsForMonth) {
 				storedEventsForMonth.filter(i => this.isWithinSelected(i.startDate) || this.isWithinSelected(i.endDate))
-				// .forEach((ev) => {
-				// 	this.appendToSelected(ev) // TODO, edit this! do not append until after all are loaded!
-				// })
+
 				this.eventsArranged = monthEvent.setSelectedMonth(this.selectedMonth)
 					.setEvents(storedEventsForMonth)
 					.events
 			}
 		},
-
-		// appendToSelected(event) {
-		// 	const startDate = parseISO(event.startDate)
-		// 	const endDate = parseISO(event.endDate)
-		//
-		// 	let tempEvent = Object.assign({}, event)
-		// 	tempEvent.date = event.startDate
-		//
-		// 	if (this.isWithinSelected(tempEvent.date)) {
-		// 		this.eventsFromSelected.push(tempEvent)
-		// 	}
-		//
-		// 	if (!isSameDay(startDate, endDate)) {
-		// 		const dateDiff = differenceInDays(endDate, startDate)
-		// 		for (let i = 1; i <= dateDiff; i++) {
-		// 			tempEvent = Object.assign({}, event)
-		// 			tempEvent.date = format(addDays(startDate, i), 'yyyy-MM-dd')
-		// 			if (this.isWithinSelected(tempEvent.date)) {
-		// 				this.eventsFromSelected.push(tempEvent)
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	this.eventsArranged = MonthEvents.addEvents(this.eventsFromSelected).events
-		// },
 
 		isWithinSelected(date) {
 			return isWithinInterval(parseISO(date), {
@@ -218,13 +191,8 @@ export default {
 		},
 
 		eventFor(date) {
-			let dayEvents = []
-
-			Object.keys(this.eventsArranged)
-				  .filter(key => isEqual(parseISO(key), date))
-				  .forEach(i => dayEvents = this.eventsArranged[i])
-
-			return dayEvents
+			return this.eventsArranged
+				.filter(event => isEqual(parseISO(event.date), date))
 		},
 
 		submitForm(formData) {
