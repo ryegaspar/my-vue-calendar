@@ -44,10 +44,13 @@
 					<ul class="whitespace-nowrap">
 						<li v-for="(ev, index) in eventFor(date)"
 							:key="index"
-							class="overflow-x-hidden px-1 text-left text-ellipsis"
-							:class="eventBgColors[index%8]"
+							class="overflow-x-hidden px-1 text-left text-ellipsis hover:cursor-pointer"
+							:class="eventClass(index, ev)"
 						>
-							{{ ev.startTime }} - {{ ev.eventDescription }}
+							<template v-if="ev.allDay">{{ ev.eventDescription }}</template>
+							<template v-else>
+								{{ ev.startTime }} - {{ ev.eventDescription }}
+							</template>
 						</li>
 					</ul>
 				</div>
@@ -103,14 +106,14 @@ export default {
 			eventsFromSelected: [],
 			eventsArranged: [],
 			eventBgColors: [
-				'text-gray-900 bg-amber-500',
-				'text-gray-200 bg-blue-500',
-				'text-gray-200 bg-red-500',
-				'text-gray-900 bg-yellow-500',
-				'text-gray-900 bg-green-500',
-				'text-gray-200 bg-indigo-500',
-				'text-gray-900 bg-purple-500',
-				'text-gray-200 bg-pink-500',
+				'text-gray-900 bg-amber-500 hover:bg-amber-600',
+				'text-gray-200 bg-blue-500 hover:bg-blue-600',
+				'text-gray-200 bg-red-500 hover:bg-blue-600',
+				'text-gray-900 bg-yellow-500 hover:bg-yellow-600',
+				'text-gray-900 bg-green-500 hover:bg-green-600',
+				'text-gray-200 bg-indigo-500 hover:bg-indigo-600',
+				'text-gray-900 bg-purple-500 hover:bg-purple-600',
+				'text-gray-200 bg-pink-500 hover:bg-pink-600',
 			]
 		}
 	},
@@ -192,7 +195,17 @@ export default {
 
 		eventFor(date) {
 			return this.eventsArranged
-				.filter(event => isEqual(parseISO(event.date), date))
+					   .filter(event => isEqual(parseISO(event.date), date))
+		},
+
+		eventClass(index, event) {
+			let evClass = `${this.eventBgColors[index%8]}`
+
+			if (!event.allDay) {
+				evClass += ` m-1 rounded-lg`
+			}
+
+			return evClass
 		},
 
 		submitForm(formData) {
